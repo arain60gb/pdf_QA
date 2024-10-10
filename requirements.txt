@@ -1,4 +1,4 @@
 openai
 django
 pymongo
-djong
+djongo
