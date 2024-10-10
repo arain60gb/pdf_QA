@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect
+from openai import OpenAI, AssistantEventHandler
+
 from .models import UploadedDocument
 import openai
 import uuid  # To generate a unique vector store ID
