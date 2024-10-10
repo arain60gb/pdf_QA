@@ -4,3 +4,4 @@ pymongo
 djongo
 pytz
 six
+django-utils-six
