@@ -3,144 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload PDF</title>
+    <title>PDF Upload and Q&A</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            color: #333;
+            padding: 20px;
         }
-
         .container {
-            background-color: #fff;
+            max-width: 600px;
+            margin: auto;
+            background: white;
             padding: 20px;
             border-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 600px;
-            margin: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
             text-align: center;
         }
-
-        h2 {
-            margin-bottom: 20px;
-            color: #2c3e50;
+        .form-group {
+            margin-bottom: 15px;
         }
-
-        .alert {
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            text-align: left;
+        label {
+            display: block;
+            margin-bottom: 5px;
         }
-
-        .alert.success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .alert.error {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-
-        .form-control {
+        input[type="file"], input[type="text"], button {
             width: 100%;
             padding: 10px;
-            margin-bottom: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
-            box-sizing: border-box;
         }
-
-        .btn {
-            background-color: #3498db;
+        button {
+            background-color: #28a745;
             color: white;
-            padding: 10px 15px;
             border: none;
-            border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
-            width: 100%;
         }
-
-        .btn:hover {
-            background-color: #2980b9;
+        button:hover {
+            background-color: #218838;
         }
-
-        .answer-container {
-            background-color: #eef;
-            padding: 15px;
-            border-radius: 5px;
+        .answer {
             margin-top: 20px;
-            text-align: left;
-        }
-
-        .question-container {
-            margin-top: 10px;
-            text-align: left;
-        }
-
-        .ask-question-container {
-            margin-top: 30px;
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 15px;
-            }
-            .btn {
-                padding: 10px;
-            }
+            padding: 10px;
+            background: #e9ecef;
+            border-left: 5px solid #007bff;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Upload a PDF File</h2>
 
-        <!-- Display messages -->
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert {{ message.tags }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
+<div class="container">
+    <h2>Upload PDF and Ask a Question</h2>
 
-        <form action="{% url 'upload_pdf_page' %}" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <input type="file" name="pdf_file" accept="application/pdf" class="form-control" required>
-            <button type="submit" class="btn">Upload PDF</button>
-        </form>
+    <!-- Form to upload PDF -->
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="pdf_file">Select PDF File:</label>
+            <input type="file" name="pdf_file" required>
+        </div>
+        <button type="submit">Upload PDF</button>
+    </form>
 
-        {% if vector_store_id %}
-            <div class="ask-question-container">
-                <h2>Ask a Question</h2>
-                <form method="POST" action="{% url 'ask_question' %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="vector_store_id" value="{{ vector_store_id }}">
-                    <input type="text" id="question" name="question" class="form-control" placeholder="Your Question" required>
-                    <button type="submit" class="btn">Ask</button>
-                </form>
-            </div>
-        {% endif %}
+    <hr>
 
-        <!-- Display the question and answer -->
-        {% if question and answer %}
-            <div class="answer-container">
-                <h3>Your Question:</h3>
-                <p>{{ question }}</p>
-                <h3>Answer:</h3>
-                <p>{{ answer }}</p>
-            </div>
-        {% endif %}
-    </div>
+    <!-- Form to ask a question about the uploaded PDF -->
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="uploaded_file">Select Uploaded File:</label>
+            <select name="uploaded_file" required>
+                <option value="">-- Select a PDF --</option>
+                {% for file in uploaded_files %}
+                    <option value="{{ file.id }}">{{ file.file_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="question">Your Question:</label>
+            <input type="text" name="question" placeholder="Type your question here..." required>
+        </div>
+        <button type="submit">Ask Question</button>
+    </form>
+
+    {% if answer %}
+        <div class="answer">
+            <strong>Answer:</strong> {{ answer }}
+        </div>
+    {% endif %}
+</div>
+
 </body>
 </html>
