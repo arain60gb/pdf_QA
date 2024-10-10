@@ -1,6 +1,6 @@
 openai
 django
-pymongo
+pymongo==3.12.0
 djongo
 pytz
 six
